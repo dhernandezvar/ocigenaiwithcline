@@ -350,7 +350,35 @@ sudo systemctl stop litellm
 
 ---
 
-## 14. Configurar Cline en VS Code
+## 14. Configurar conexión de base de datos en SQL Developer
+
+Antes de configurar Cline, debes registrar la conexión a tu base de datos Oracle en la extensión SQL Developer de VS Code. El MCP Server utiliza las conexiones guardadas en SQL Developer para conectarse a la base de datos, por lo que **la conexión debe estar guardada con usuario y password** — si no se guarda el password, el MCP no podrá autenticarse automáticamente.
+
+### Pasos
+
+1. En VS Code, abre la extensión **Oracle SQL Developer** desde el panel lateral
+2. Haz clic en el ícono **+** para agregar una nueva conexión
+3. Completa los datos de conexión:
+
+| Campo | Valor |
+|---|---|
+| **Connection Name** | Nombre descriptivo (ej. `DEMOADB`) |
+| **Authentication Type** | `Default` |
+| **Username** | Usuario de la base de datos (ej. `ADMIN`) |
+| **Password** | Password del usuario |
+| **Save Password** | ✅ **Activar obligatoriamente** |
+| **Connection Type** | `Cloud Wallet` / `Basic` / `TNS` según corresponda |
+| **Configuration File** | Wallet `.zip` si usas Autonomous Database |
+| **Service** | Nombre del servicio TNS (ej. `demoadb_high`) |
+
+4. Haz clic en **Test** para verificar la conexión
+5. Haz clic en **Save** para guardar
+
+> **Importante:** El MCP Server de SQLcl utiliza las conexiones almacenadas en SQL Developer para ejecutar comandos en la base de datos. Si el password no está guardado, el MCP fallará al intentar conectarse desde Cline sin interfaz gráfica disponible.
+
+---
+
+## 15. Configurar Cline en VS Code
 
 Abre la configuración de Cline y usa los siguientes parámetros:
 
@@ -367,7 +395,7 @@ Abre la configuración de Cline y usa los siguientes parámetros:
 
 ---
 
-## 15. Validación final desde Cline
+## 16. Validación final desde Cline
 
 Una vez configurado, envía un mensaje de prueba desde Cline. Si todo está correctamente configurado, verás una respuesta similar a la siguiente:
 
@@ -401,7 +429,7 @@ Cline → LiteLLM Proxy → OCI Generative AI → xAI Grok-4
 
 ---
 
-## 16. Configurar MCP Server (SQLcl) en Cline
+## 17. Configurar MCP Server (SQLcl) en Cline
 
 El MCP Server permite a Cline interactuar directamente con Oracle Database usando lenguaje natural.
 
