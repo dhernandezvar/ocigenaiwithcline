@@ -123,13 +123,15 @@ Copia y guarda este bloque — contiene todos los valores que necesitarás para 
 
 ## 3. Crear VM Oracle Linux 9 en OCI
 
-Shape recomendado:
+Shape mínimo recomendado:
 
 ```text
 Shape: VM.Standard.E4.Flex
 OCPU: 1
 RAM: 8 GB
 OS: Oracle Linux 9
+
+Las capacidades pueden variar de acuerdo con tu capacidad transaccional requerida.
 ```
 
 ---
