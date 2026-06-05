@@ -84,22 +84,39 @@ OCI Console → Generative AI → Playground → Ejecutar prompt
 
 ## 2. Crear API Key OCI
 
-```bash
-openssl genrsa -out oci_api_key.pem 2048
-openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
+La forma recomendada es generar el par de claves directamente desde la consola OCI, que se encarga de todo automáticamente.
+
+### Pasos en OCI Console
+
+1. Inicia sesión en [https://cloud.oracle.com](https://cloud.oracle.com)
+2. Haz clic en el ícono de perfil (esquina superior derecha) → **User Settings**
+3. En el menú izquierdo, selecciona **API Keys**
+4. Haz clic en **Add API Key**
+5. Selecciona **Generate API Key Pair**
+6. Haz clic en **Download Private Key** → guarda el archivo `oci_api_key.pem` en un lugar seguro
+7. Haz clic en **Add**
+
+### Guardar los datos de configuración
+
+Después de agregar la clave, OCI muestra un resumen de configuración similar a este:
+
+```ini
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaaxxx
+fingerprint=7a:c4:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+tenancy=ocid1.tenancy.oc1..aaaaaaaaxxx
+region=us-chicago-1
+key_file=~/.oci/oci_api_key.pem
 ```
 
-Sube la clave pública en:
+Copia y guarda este bloque — contiene todos los valores que necesitarás para configurar LiteLLM:
 
-```text
-Identity & Security → Users → API Keys → Add API Key
-```
-
-Guarda los siguientes valores, los necesitarás más adelante:
-
-- **User OCID**
-- **Tenancy OCID**
-- **Fingerprint**
+| Valor | Dónde se usa en `config.yaml` |
+|---|---|
+| `user` | `oci_user` |
+| `fingerprint` | `oci_fingerprint` |
+| `tenancy` | `oci_tenancy` |
+| `key_file` | `oci_key_file` |
 
 ---
 
