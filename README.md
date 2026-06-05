@@ -93,8 +93,9 @@ La forma recomendada es generar el par de claves directamente desde la consola O
 3. En el menú izquierdo, selecciona **API Keys**
 4. Haz clic en **Add API Key**
 5. Selecciona **Generate API Key Pair**
-6. Haz clic en **Download Private Key** → guarda el archivo `oci_api_key.pem` en un lugar seguro
-7. Haz clic en **Add**
+6. Haz clic en **Download Public Key** → guarda el archivo `oci_api_key_public.pem` en un lugar seguro
+7. Haz clic en **Download Private Key** → guarda el archivo `oci_api_key.pem` en un lugar seguro
+8. Haz clic en **Add**
 
 ### Guardar los datos de configuración
 
