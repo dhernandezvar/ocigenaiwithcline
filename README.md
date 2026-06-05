@@ -2,18 +2,7 @@
 
 ## Arquitectura
 
-```text
-Cline (VS Code)
-        |
-        v
-LiteLLM Proxy (OEL9 VM)
-        |
-        v
-OCI Generative AI
-        |
-        v
-xAI Grok-4
-```
+![Arquitectura Cline + LiteLLM + OCI Generative AI](images/arquitectura.png)
 
 ---
 
@@ -93,9 +82,8 @@ La forma recomendada es generar el par de claves directamente desde la consola O
 3. En el menú izquierdo, selecciona **API Keys**
 4. Haz clic en **Add API Key**
 5. Selecciona **Generate API Key Pair**
-6. Haz clic en **Download Public Key** → guarda el archivo `oci_api_key_public.pem` en un lugar seguro
-7. Haz clic en **Download Private Key** → guarda el archivo `oci_api_key.pem` en un lugar seguro
-8. Haz clic en **Add**
+6. Haz clic en **Download Private Key** → guarda el archivo `oci_api_key.pem` en un lugar seguro
+7. Haz clic en **Add**
 
 ### Guardar los datos de configuración
 
@@ -123,15 +111,13 @@ Copia y guarda este bloque — contiene todos los valores que necesitarás para 
 
 ## 3. Crear VM Oracle Linux 9 en OCI
 
-Shape mínimo recomendado:
+Shape recomendado:
 
 ```text
 Shape: VM.Standard.E4.Flex
 OCPU: 1
 RAM: 8 GB
 OS: Oracle Linux 9
-
-Las capacidades pueden variar de acuerdo con tu capacidad transaccional requerida.
 ```
 
 ---
@@ -517,3 +503,10 @@ Cline utilizará automáticamente las herramientas MCP de SQLcl para ejecutar la
 │ us-chicago-1      │
 └───────────────────┘
 ```
+
+---
+
+## Referencias
+
+- **[LiteLLM — OCI Generative AI Provider](https://docs.litellm.ai/docs/providers/oci)**
+  Documentación oficial de LiteLLM sobre la integración con Oracle Cloud Infrastructure Generative AI. Incluye los parámetros de configuración soportados, modelos disponibles, ejemplos de uso con Python SDK y proxy, y opciones de autenticación con OCI.
