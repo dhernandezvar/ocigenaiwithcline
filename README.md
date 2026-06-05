@@ -1,3 +1,5 @@
+# OCI Vibe: GenAI-Powered Agent
+
 # Guía Completa: Cline + LiteLLM + OCI Generative AI (Grok-4) en Oracle Linux 9
 
 ## Arquitectura
