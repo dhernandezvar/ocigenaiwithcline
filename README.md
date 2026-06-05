@@ -155,9 +155,12 @@ sudo su - litellm
 
 ## 7. Crear entorno virtual Python
 
+En OEL9, SELinux bloquea la ejecución de binarios desde `/home` cuando son invocados por systemd, aunque los permisos Unix sean correctos (error `status=203/EXEC` en journald). Por eso el virtualenv debe crearse en `/opt`:
+
 ```bash
-python3.11 -m venv ~/litellm-env
-source ~/litellm-env/bin/activate
+sudo mkdir -p /opt/litellm-env
+sudo chown litellm:litellm /opt/litellm-env
+sudo -u litellm python3.11 -m venv /opt/litellm-env
 ```
 
 ---
@@ -165,9 +168,8 @@ source ~/litellm-env/bin/activate
 ## 8. Instalar LiteLLM
 
 ```bash
-pip install --upgrade pip
-pip install "litellm[proxy]"
-pip install oci
+sudo -u litellm /opt/litellm-env/bin/pip install --upgrade pip
+sudo -u litellm /opt/litellm-env/bin/pip install "litellm[proxy]" oci
 ```
 
 ---
@@ -226,8 +228,8 @@ general_settings:
 Inicia el proxy manualmente para verificar que todo funciona antes de registrarlo como servicio:
 
 ```bash
-litellm \
-  --config ~/litellm/config.yaml \
+sudo -u litellm /opt/litellm-env/bin/litellm \
+  --config /home/litellm/litellm/config.yaml \
   --host 0.0.0.0 \
   --port 4000
 ```
@@ -302,7 +304,7 @@ Group=litellm
 
 WorkingDirectory=/home/litellm/litellm
 
-ExecStart=/home/litellm/litellm-env/bin/litellm \
+ExecStart=/opt/litellm-env/bin/litellm \
   --config /home/litellm/litellm/config.yaml \
   --host 0.0.0.0 \
   --port 4000
@@ -317,7 +319,7 @@ WantedBy=multi-user.target
 
 > **Puntos clave del servicio:**
 > - `User=litellm` — corre con el usuario de servicio dedicado, no como root
-> - `ExecStart` apunta al binario **dentro del virtualenv**, no al Python del sistema
+> - `ExecStart` apunta al virtualenv en `/opt` — necesario porque SELinux en OEL9 bloquea la ejecución de binarios desde `/home` cuando son invocados por systemd
 > - `Restart=always` — se reinicia automáticamente si el proceso falla
 > - `RestartSec=10` — espera 10 segundos entre reinicios para evitar loops
 > - `PYTHONUNBUFFERED=1` — los logs aparecen en tiempo real en journald
