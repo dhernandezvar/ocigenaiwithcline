@@ -538,6 +538,109 @@ Cline utilizará automáticamente las herramientas MCP de SQLcl para ejecutar la
 
 ---
 
+## 18. (Opcional) Public Load Balancer + WAF
+
+> Esta configuración es recomendada para ambientes productivos o cuando el proxy LiteLLM debe ser accesible desde múltiples usuarios o redes corporativas. Agrega una capa de seguridad frente a Internet y restringe el acceso directo a la VM.
+
+### Arquitectura con LB + WAF
+
+```text
+Cline (VS Code)
+        |
+        v
+OCI WAF (Web Application Firewall)
+        |
+        v
+OCI Public Load Balancer (:443)
+        |
+        v
+LiteLLM Proxy (OEL9 VM, :4000) — sin exposición directa a Internet
+        |
+        v
+OCI Generative AI
+```
+
+### 18.1 Crear el Load Balancer
+
+En OCI Console:
+
+```text
+Networking → Load Balancers → Create Load Balancer
+```
+
+| Campo | Valor |
+|---|---|
+| **Type** | Public |
+| **Shape** | Flexible (10 Mbps mínimo) |
+| **Subnet** | Subnet pública de tu VCN |
+| **Protocol** | HTTPS (443) — requiere certificado |
+| **Backend port** | 4000 |
+| **Backend** | IP privada de la VM OEL9 |
+
+#### Health Check
+
+```text
+Protocol: HTTP
+Port: 4000
+URL Path: /health
+```
+
+> LiteLLM expone `/health` por defecto — el LB lo usará para verificar que el proxy está activo.
+
+### 18.2 Ajustar Security List / NSG
+
+Una vez que el Load Balancer esté creado, **elimina la regla de Ingress del puerto 4000 hacia Internet** y reemplázala por una regla que solo permita tráfico desde la subred del Load Balancer:
+
+| Tipo | Source | Protocolo | Puerto |
+|---|---|---|---|
+| Ingress | CIDR subred LB | TCP | 4000 |
+| Ingress | `0.0.0.0/0` | TCP | 443 *(solo en LB)* |
+
+Esto garantiza que la VM no sea accesible directamente desde Internet.
+
+### 18.3 Configurar firewalld en la VM
+
+Actualiza firewalld para aceptar el puerto 4000 solo desde la subred del Load Balancer:
+
+```bash
+# Eliminar la regla pública anterior
+sudo firewall-cmd --permanent --zone=public --remove-port=4000/tcp
+
+# Agregar regla restringida a la subred del LB (ajusta el CIDR)
+sudo firewall-cmd --permanent --zone=public \
+  --add-rich-rule='rule family="ipv4" source address="10.0.0.0/24" port port="4000" protocol="tcp" accept'
+
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+```
+
+### 18.4 Activar OCI WAF
+
+```text
+Identity & Security → Web Application Firewall → Create WAF Policy
+```
+
+| Campo | Valor |
+|---|---|
+| **Origin** | IP pública o hostname del Load Balancer |
+| **Protection Rules** | Activar OWASP Core Rule Set |
+| **Rate Limiting** | Recomendado: 100 req/min por IP |
+| **Access Rules** | Restringir por IP corporativa si aplica |
+
+Asocia la política WAF al Load Balancer creado en el paso anterior.
+
+### 18.5 Actualizar Cline con la nueva URL
+
+Una vez activo el LB, actualiza la **Base URL** en Cline:
+
+| Campo | Valor anterior | Valor nuevo |
+|---|---|---|
+| Base URL | `http://<IP_VM>:4000` | `https://<hostname_LB>` |
+
+> El resto de la configuración (API Key y Model) permanece igual.
+
+---
+
 ## Referencias
 
 - **[LiteLLM — OCI Generative AI Provider](https://docs.litellm.ai/docs/providers/oci)**
